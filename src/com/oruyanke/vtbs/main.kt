@@ -17,7 +17,6 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 object ServerConfig {
     var TESTING = false
-    lateinit var DB_NAME: String
 }
 
 @ExperimentalStdlibApi
@@ -25,11 +24,6 @@ object ServerConfig {
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     ServerConfig.TESTING = testing
-    ServerConfig.DB_NAME = when (testing) {
-        true -> "vtbtn-debug"
-        false -> "vtbtn-product"
-    }
-
     installFeatures()
 
     routing {
