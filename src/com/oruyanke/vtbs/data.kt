@@ -2,7 +2,7 @@ package com.oruyanke.vtbs
 
 data class Vtuber(val name: String, val voiceGroups: List<VoiceGroup>)
 
-data class VoiceGroup(val name: String, val voices: List<Voice>)
+data class VoiceGroup(val name: String, val text: List<LocalizedText>, val voices: List<Voice>)
 
 data class Voice(val url: String, val text: List<LocalizedText>)
 
