@@ -12,10 +12,10 @@ class ApplicationTest {
     @Test
     fun testGreetings() {
         withTestApplication({ module(testing = true) }) {
-            handleRequest(HttpMethod.Get, "/greetings").apply {
+            handleRequest(HttpMethod.Get, "/vtubers").apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("""
-                    {"code":0,"result":{"text":{"zh":"你好","en":"hello","jp":"こんにちは"}}}
+                    {"aqua":"/vtubers/aqua","fubuki":"/vtubers/fubuki"}
                 """.trimIndent(), response.content)
             }
         }
