@@ -42,18 +42,18 @@ class PostTest {
         val json = mapper.readValue(File(file), ExternalJson::class.java)
 
         json.groups
-            .map { GroupInfo(name = it.group_name, desc = it.group_description.localized()) }
+            .map { Group(name = it.group_name, desc = it.group_description.localized()) }
             .forEach { addGroup(it) }
         json.groups
             .flatMap { group ->
                 group.voice_list.map {
-                    VoiceInfo(it.name, it.path, group.group_name, it.description.localized())
+                    Voice(it.name, it.path, group.group_name, it.description.localized())
                 }
             }
             .forEach { addVoice(it) }
     }
 
-    private fun addVoice(voice: VoiceInfo) {
+    private fun addVoice(voice: Voice) {
         withTestApplication({ module(testing = true) }) {
             handleRequest(HttpMethod.Post, "/vtubers/fubuki/${voice.group}/add-voice") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -70,7 +70,7 @@ class PostTest {
         }
     }
 
-    private fun addGroup(group: GroupInfo) {
+    private fun addGroup(group: Group) {
         withTestApplication({ module(testing = true) }) {
             handleRequest(HttpMethod.Post, "/vtubers/fubuki/add-group") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())

@@ -14,6 +14,7 @@ import io.ktor.routing.route
 import io.ktor.util.pipeline.PipelineContext
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.eq
 
 fun Route.userRoutes() {
     val mongo: CoroutineClient by inject()
@@ -30,7 +31,17 @@ fun Route.userRoutes() {
 
         get("/{vtb}") {
             val vtb = param("vtb")
-            val groups = mongo.forVtuber(vtb).groups().find().toList()
+            val db = mongo.forVtuber(vtb)
+
+            val voices = db.voices().find().toList()
+                .map { it.toResponse() }
+                .groupBy { it.group }
+                .toMap()
+
+            val groups = db.groups().find().toList()
+                .map { it.toResponseWith(voices[it.name] ?: listOf()) }
+                .toList()
+
             call.respond(
                 mapOf(
                     "name" to vtb,
@@ -44,23 +55,25 @@ fun Route.userRoutes() {
                 val vtb = param("vtb")
                 val group = param("group")
                 val db = mongo.forVtuber(vtb)
-                val groupInfo = db.groups().find("name = $group").first()
-                    ?: throw IllegalArgumentException("group '$group' not found")
-                val voices = db.voices().find("group = $group").toList()
 
-                call.respond(
-                    mapOf(
-                        "group" to groupInfo,
-                        "voices" to voices
-                    )
-                )
+                val groupInfo = db.groups()
+                    .find(Group::name eq group)
+                    .first()
+                    ?: throw IllegalArgumentException("group '$group' not found")
+
+                val voices = db.voices()
+                    .find(Voice::group eq group)
+                    .toList()
+                    .map { it.toResponse() }
+
+                call.respond(groupInfo.toResponseWith(voices))
             }
         }
 
         post<AddGroupRequest>("/{vtb}/add-group") { request ->
             errorAware {
                 val vtb = param("vtb")
-                val group = GroupInfo(name = request.name, desc = request.desc)
+                val group = Group(name = request.name, desc = request.desc)
                 mongo.forVtuber(vtb).groups().insertOne(group)
                 call.respond(HttpStatusCode.OK)
             }
@@ -70,7 +83,7 @@ fun Route.userRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
-                val voice = VoiceInfo(
+                val voice = Voice(
                     name = request.name,
                     url = request.url,
                     group = group,

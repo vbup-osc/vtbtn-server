@@ -3,13 +3,15 @@ package com.oruyanke.vtbs
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
-data class GroupInfo(val name: String, val desc: List<LocalizedText>)
+data class Group(val name: String, val desc: List<LocalizedText>)
 
-data class VoiceInfo(val name: String, val url: String, val group: String, val desc: List<LocalizedText>)
+data class Voice(val name: String, val url: String, val group: String, val desc: List<LocalizedText>)
 
-data class AddVoiceRequest(val name: String, val url: String, val desc: List<LocalizedText>)
+fun Group.toResponseWith(voices: List<VoiceResponse>) =
+    GroupResponse(name, desc.toLocalizedMap(), voices)
 
-data class AddGroupRequest(val name: String, val desc: List<LocalizedText>)
+fun Voice.toResponse() =
+    VoiceResponse(name, url, group, desc.toLocalizedMap())
 
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
@@ -24,7 +26,7 @@ data class LocalizedText(val lang: String, val text: String) {
     }
 }
 
-fun List<LocalizedText>.toMap(): Map<String, String> =
+fun List<LocalizedText>.toLocalizedMap(): Map<String, String> =
     this.map { Pair(it.lang, it.text) }
         .toMap()
 
@@ -34,6 +36,6 @@ suspend fun CoroutineClient.vtuberNames() =
     this.listDatabaseNames()
         .filter { it.startsWith("vtuber-") }
 
-fun CoroutineDatabase.groups() = this.getCollection<GroupInfo>("groups")
+fun CoroutineDatabase.groups() = this.getCollection<Group>("groups")
 
-fun CoroutineDatabase.voices() = this.getCollection<VoiceInfo>("voices")
+fun CoroutineDatabase.voices() = this.getCollection<Voice>("voices")
