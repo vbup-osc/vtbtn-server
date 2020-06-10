@@ -10,6 +10,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 object ServerConfig {
     var testing = false
+    const val endpoint = ""
 }
 
 @ExperimentalStdlibApi
