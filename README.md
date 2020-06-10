@@ -1,5 +1,4 @@
-danmaku-judger-server
+vtbtn-server
 =====================
 
-Server for [the Black Project](https://github.com/ShirakamiEmmmer/black)
-
+All-in-one server for all vtb-button projects.
