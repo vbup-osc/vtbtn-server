@@ -15,15 +15,6 @@ import io.ktor.util.pipeline.PipelineContext
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
 
-data class Greeting(
-    val text: Map<String, String> =
-        listOf(
-            LocalizedText.zh("你好"),
-            LocalizedText.en("hello"),
-            LocalizedText.ja("こんにちは")
-        ).toMap()
-)
-
 fun Route.userRoutes() {
     val mongo: CoroutineClient by inject()
 
