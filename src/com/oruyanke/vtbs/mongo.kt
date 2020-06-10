@@ -11,7 +11,7 @@ fun Group.toResponseWith(voices: List<VoiceResponse>) =
     GroupResponse(name, desc.toLocalizedMap(), voices)
 
 fun Voice.toResponse() =
-    VoiceResponse(name, url, group, desc.toLocalizedMap())
+    VoiceResponse(name, url, desc.toLocalizedMap())
 
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
