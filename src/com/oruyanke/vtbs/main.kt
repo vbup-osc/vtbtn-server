@@ -27,7 +27,7 @@ fun Application.module(testing: Boolean = false) {
     installFeatures()
 
     routing {
-        userRoutes()
+        vtuberRoutes()
     }
 }
 

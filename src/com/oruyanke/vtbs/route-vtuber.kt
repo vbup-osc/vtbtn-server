@@ -16,7 +16,7 @@ import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.eq
 
-fun Route.userRoutes() {
+fun Route.vtuberRoutes() {
     val mongo: CoroutineClient by inject()
 
     route("/vtubers") {
