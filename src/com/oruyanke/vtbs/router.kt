@@ -11,10 +11,24 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 
+data class Greeting(
+    val text: Map<String, String> =
+        listOf(
+            LocalizedText.zh("你好"),
+            LocalizedText.en("hello"),
+            LocalizedText.jp("こんにちは")
+        ).toMap()
+);
+
 fun Application.setupRouter() {
     routing {
         get(path("/greetings")) {
-            call.respond("hello, world!")
+            call.respond(
+                mapOf(
+                    "code" to 0,
+                    "result" to Greeting()
+                )
+            )
         }
 
         get(path("/")) {
