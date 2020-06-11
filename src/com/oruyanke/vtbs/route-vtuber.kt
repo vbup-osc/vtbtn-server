@@ -73,7 +73,11 @@ fun Route.vtuberRoutes() {
         post<AddGroupRequest>("/{vtb}/add-group") { request ->
             errorAware {
                 val vtb = param("vtb")
-                val group = Group(name = request.name, desc = request.desc)
+                val group = Group(
+                    name = request.name,
+                    desc = request.desc.toLocalizedTexts()
+                )
+
                 mongo.forVtuber(vtb).groups().insertOne(group)
                 call.respond(HttpStatusCode.OK)
             }
@@ -87,8 +91,9 @@ fun Route.vtuberRoutes() {
                     name = request.name,
                     url = request.url,
                     group = group,
-                    desc = request.desc
+                    desc = request.desc.toLocalizedTexts()
                 )
+
                 mongo.forVtuber(vtb).voices().insertOne(voice)
                 call.respond(HttpStatusCode.OK)
             }

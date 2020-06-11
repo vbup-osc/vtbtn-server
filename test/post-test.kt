@@ -42,12 +42,12 @@ class PostTest {
         val json = mapper.readValue(File(file), ExternalJson::class.java)
 
         json.groups
-            .map { Group(name = it.group_name, desc = it.group_description.localized()) }
+            .map { Group(name = it.group_name, desc = it.group_description.toLocalizedTexts()) }
             .forEach { addGroup(it) }
         json.groups
             .flatMap { group ->
                 group.voice_list.map {
-                    Voice(it.name, it.path, group.group_name, it.description.localized())
+                    Voice(it.name, it.path, group.group_name, it.description.toLocalizedTexts())
                 }
             }
             .forEach { addVoice(it) }
@@ -61,7 +61,7 @@ class PostTest {
                     mapOf(
                         "name" to voice.name,
                         "url" to voice.url,
-                        "desc" to voice.desc
+                        "desc" to voice.desc.toLocalizedMap()
                     ).json
                 )
             }.apply {
@@ -77,7 +77,7 @@ class PostTest {
                 setBody(
                     mapOf(
                         "name" to group.name,
-                        "desc" to group.desc
+                        "desc" to group.desc.toLocalizedMap()
                     ).json
                 )
             }.apply {
@@ -86,7 +86,3 @@ class PostTest {
         }
     }
 }
-
-private fun Map<String, String>.localized() =
-    this.map { LocalizedText(it.key, it.value) }
-        .toList()

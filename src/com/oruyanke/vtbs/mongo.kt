@@ -1,11 +1,20 @@
 package com.oruyanke.vtbs
 
+import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
-data class Group(val name: String, val desc: List<LocalizedText>)
+data class Group(
+    @BsonId val name: String,
+    val desc: List<LocalizedText>
+)
 
-data class Voice(val name: String, val url: String, val group: String, val desc: List<LocalizedText>)
+data class Voice(
+    @BsonId val name: String,
+    val url: String,
+    val group: String,
+    val desc: List<LocalizedText>
+)
 
 fun Group.toResponseWith(voices: List<VoiceResponse>) =
     GroupResponse(name, desc.toLocalizedMap(), voices)
@@ -30,11 +39,12 @@ fun List<LocalizedText>.toLocalizedMap(): Map<String, String> =
     this.map { Pair(it.lang, it.text) }
         .toMap()
 
-fun CoroutineClient.forVtuber(name: String) = this.getDatabase("vtuber-$name")
+fun CoroutineClient.forVtuber(name: String) = this.getDatabase("vtuber_$name")
 
 suspend fun CoroutineClient.vtuberNames() =
     this.listDatabaseNames()
-        .filter { it.startsWith("vtuber-") }
+        .filter { it.startsWith("vtuber_") }
+        .map { it.removePrefix("vtuber_") }
 
 fun CoroutineDatabase.groups() = this.getCollection<Group>("groups")
 
