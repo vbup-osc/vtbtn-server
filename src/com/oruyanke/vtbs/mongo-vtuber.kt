@@ -5,6 +5,7 @@ import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.eq
 
 data class Group(
     @BsonId val name: String,
@@ -68,8 +69,15 @@ private suspend inline fun <reified T : Any> CoroutineCollection<T>.insertOrBadR
 suspend fun CoroutineCollection<Group>.addGroup(group: Group) =
     insertOrBadRequest(group) { "Group '${group.name}' already exists" }
 
+suspend fun CoroutineCollection<Group>.byName(name: String) =
+    findOneById(name)
+        ?: throw BadRequestException("Group '$name' not found")
+
 suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
     insertOrBadRequest(voice) { "Voice '${voice.name}' already exists in group '${voice.group}'" }
+
+fun CoroutineCollection<Voice>.byGroup(group: String) =
+    find(Voice::group eq group)
 
 private object MongoErrorCodes {
     const val KEY_DUPLICATE = 11000

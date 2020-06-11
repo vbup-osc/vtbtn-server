@@ -10,7 +10,6 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
-import org.litote.kmongo.eq
 
 fun Route.vtuberRoutes() {
     val mongo: CoroutineClient by inject()
@@ -52,13 +51,9 @@ fun Route.vtuberRoutes() {
                 val group = param("group")
                 val db = mongo.forVtuber(vtb)
 
-                val groupInfo = db.groups()
-                    .find(Group::name eq group)
-                    .first()
-                    ?: throw IllegalArgumentException("group '$group' not found")
-
+                val groupInfo = db.groups().byName(group)
                 val voices = db.voices()
-                    .find(Voice::group eq group)
+                    .byGroup(group)
                     .toList()
                     .map { it.toResponse() }
 
