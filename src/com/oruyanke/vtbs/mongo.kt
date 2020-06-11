@@ -1,7 +1,9 @@
 package com.oruyanke.vtbs
 
+import com.mongodb.MongoWriteException
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
 data class Group(
@@ -49,3 +51,26 @@ suspend fun CoroutineClient.vtuberNames() =
 fun CoroutineDatabase.groups() = this.getCollection<Group>("groups")
 
 fun CoroutineDatabase.voices() = this.getCollection<Voice>("voices")
+
+private suspend inline fun <reified T : Any> CoroutineCollection<T>.insertOrBadRequest(
+    data: T,
+    message: () -> String
+) = try {
+    this.insertOne(data)
+} catch (e: MongoWriteException) {
+    when (e.error.code) {
+        MongoErrorCodes.KEY_DUPLICATE ->
+            throw BadRequestException(message())
+        else -> throw e
+    }
+}
+
+suspend fun CoroutineCollection<Group>.addGroup(group: Group) =
+    insertOrBadRequest(group) { "Group '${group.name}' already exists" }
+
+suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
+    insertOrBadRequest(voice) { "Voice '${voice.name}' already exists in group '${voice.group}'" }
+
+private object MongoErrorCodes {
+    const val KEY_DUPLICATE = 11000
+}
