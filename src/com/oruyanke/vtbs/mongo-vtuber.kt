@@ -6,6 +6,7 @@ import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import java.util.*
 
 data class Group(
     @BsonId val name: String,
@@ -19,11 +20,21 @@ data class Voice(
     val desc: List<LocalizedText>
 )
 
+data class Statistic(
+    @BsonId val date: Date,
+    val name: String,
+    val time: Int,
+    val group: String
+)
+
 fun Group.toResponseWith(voices: List<VoiceResponse>) =
     GroupResponse(name, desc.toLocalizedMap(), voices)
 
 fun Voice.toResponse() =
     VoiceResponse(name, url, group, desc.toLocalizedMap())
+
+fun Statistic.toResponse() =
+    StatisticResponse(name, date, group)
 
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
@@ -53,6 +64,8 @@ fun CoroutineDatabase.groups() = this.getCollection<Group>("groups")
 
 fun CoroutineDatabase.voices() = this.getCollection<Voice>("voices")
 
+fun CoroutineDatabase.statistics() = this.getCollection<Statistic>("statistics")
+
 private suspend inline fun <reified T : Any> CoroutineCollection<T>.insertOrBadRequest(
     data: T,
     message: () -> String
@@ -72,6 +85,10 @@ suspend fun CoroutineCollection<Group>.addGroup(group: Group) =
 suspend fun CoroutineCollection<Group>.byName(name: String) =
     findOneById(name)
         ?: throw BadRequestException("Group '$name' not found")
+
+//suspend fun CoroutineCollection<Statistic>.plusOne(date: Date,name: String)=
+//        findOneAndUpdate(date,name,{time++})
+
 
 suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
     insertOrBadRequest(voice) { "Voice '${voice.name}' already exists in group '${voice.group}'" }
