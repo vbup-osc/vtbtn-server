@@ -1,11 +1,13 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.koin:koin-gradle-plugin:$koin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:$shadow_version"
     }
 }
 
@@ -16,6 +18,8 @@ apply plugin: 'koin'
 group 'com.oruyanke.vtbs'
 version '0.0.1'
 mainClassName = "io.ktor.server.netty.EngineMain"
+
+apply plugin: "com.github.johnrengelman.shadow"
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
@@ -31,10 +35,10 @@ repositories {
     maven { url 'https://kotlin.bintray.com/kotlinx' }
 }
 
-jar {
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+shadowJar {
+    baseName = 'server'
+    classifier = null
+    version = null
 }
 
 tasks {
