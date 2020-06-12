@@ -9,7 +9,9 @@ import io.ktor.routing.route
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.eq
+import org.litote.kmongo.inc
 import org.litote.kmongo.setValue
+import org.litote.kmongo.upsert
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,18 +51,12 @@ fun Route.statisticsRoutes() {
                 mongo.forVtuber(vtb).statistics().updateOne(
                         org.litote.kmongo.and(
                                 Statistic::date eq date,
+                                Statistic::group eq group,
                                 Statistic::name eq voiceName
                         ),
-                        setValue(Statistic::time, 1)
+                        inc(Statistic::time, 1),
+                        upsert()
                 )
-                        ?: mongo.forVtuber(vtb).statistics().insertOne(
-                                Statistic(
-                                        date = date,
-                                        name = voiceName,
-                                        time = 1,
-                                        group = group
-                                )
-                        )
             }
         }
 
