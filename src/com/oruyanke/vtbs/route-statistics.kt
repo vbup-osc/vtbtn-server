@@ -49,10 +49,9 @@ fun Route.statisticsRoutes() {
                         mapOf(
                                 "vtuber" to vtb,
                                 "group" to group,
-                                "finalClickTimes" to sum)
+                                "finalClickTimes" to sum
+                        )
                 )
-
-
             }
         }
 
@@ -97,6 +96,7 @@ fun Route.statisticsRoutes() {
                 )
             }
         }
+
         get("/{vtb}/{group}/{voice}/{start}/{end}") {
             errorAware {
                 val vtb = param("vtb")
@@ -125,7 +125,6 @@ fun Route.statisticsRoutes() {
             }
         }
 
-
         post<PlusOneRequest>("/{vtb}") {
             errorAware {
                 val vtb = param("vtb")
@@ -136,7 +135,8 @@ fun Route.statisticsRoutes() {
                                 Statistic::group eq it.group
                         ),
                         inc(Statistic::time, 1),
-                        upsert())
+                        upsert()
+                )
 
             }
         }
