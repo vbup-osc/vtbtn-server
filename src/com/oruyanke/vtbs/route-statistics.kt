@@ -23,7 +23,7 @@ fun Route.statisticsRoutes() {
         get("/{vtb}") {
             errorAware {
                 val vtb = param("vtb")
-                val sum = mongo.forVtuber(vtb).statistics().totalClicked()
+                val sum = mongo.forVtuber(vtb).statistics().totalClickTime()
 
                 call.respond(
                     mapOf(
@@ -38,7 +38,7 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
-                val sum = mongo.forVtuber(vtb).statistics().groupClicked(group)
+                val sum = mongo.forVtuber(vtb).statistics().groupClickTime(group)
 
                 call.respond(
                     mapOf(
@@ -59,7 +59,7 @@ fun Route.statisticsRoutes() {
                 val startTime = queryTimeOrEpoch("from")
                 val endTime = queryTimeOrNow("to")
 
-                val sum = mongo.forVtuber(vtb).statistics().rangeClicked(
+                val sum = mongo.forVtuber(vtb).statistics().rangeClickTime(
                     startTime,
                     endTime,
                     Statistic::name eq voiceName,

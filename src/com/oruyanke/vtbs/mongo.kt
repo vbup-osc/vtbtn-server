@@ -94,13 +94,13 @@ suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
 fun CoroutineCollection<Voice>.byGroup(group: String) =
     find(Voice::group eq group)
 
-suspend fun CoroutineCollection<Statistic>.groupClicked(group: String) =
+suspend fun CoroutineCollection<Statistic>.groupClickTime(group: String) =
     find(Statistic::group eq group).toList().sumClick()
 
-suspend fun CoroutineCollection<Statistic>.totalClicked() =
+suspend fun CoroutineCollection<Statistic>.totalClickTime() =
     find().toList().sumClick()
 
-suspend fun CoroutineCollection<Statistic>.rangeClicked(
+suspend fun CoroutineCollection<Statistic>.rangeClickTime(
     from: LocalDate,
     to: LocalDate,
     vararg filters: Bson = arrayOf(EMPTY_BSON)
