@@ -40,19 +40,27 @@ fun Route.statisticsRoutes() {
             }
         }
 
-        post("/{vtb}/{name}") {
+        post("/{vtb}/{group}/{name}") {
             errorAware {
                 val date = SimpleDateFormat("yyyy/M/dd").format(Date()).toString()
                 val vtb = param("vtb")
-                val name = param("name")
+                val group = param("group")
+                val voiceName = param("name")
                 mongo.forVtuber(vtb).statistics().updateOne(
                         org.litote.kmongo.and(
                                 Statistic::date eq date,
-                                Statistic::name eq name
+                                Statistic::name eq voiceName
                         ),
                         setValue(Statistic::time, 1)
                 )
-
+                        ?: mongo.forVtuber(vtb).statistics().insertOne(
+                                Statistic(
+                                        date = date,
+                                        name = voiceName,
+                                        time = 1,
+                                        group = group
+                                )
+                        )
             }
         }
 
