@@ -8,12 +8,8 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import org.koin.ktor.ext.inject
-import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.eq
-import org.litote.kmongo.inc
-import org.litote.kmongo.upsert
-import java.time.LocalDate
 
 
 fun Route.statisticsRoutes() {
@@ -82,15 +78,7 @@ fun Route.statisticsRoutes() {
         post<PlusOneRequest>("/{vtb}/click") {
             errorAware {
                 val vtb = param("vtb")
-                mongo.forVtuber(vtb).statistics().updateOne(
-                    and(
-                        Statistic::date eq LocalDate.now(),
-                        Statistic::name eq it.name,
-                        Statistic::group eq it.group
-                    ),
-                    inc(Statistic::time, 1),
-                    upsert()
-                )
+                mongo.forVtuber(vtb).statistics().click(it.group, it.name)
                 call.respond(HttpStatusCode.OK)
             }
         }

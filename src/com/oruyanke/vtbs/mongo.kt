@@ -4,13 +4,10 @@ import com.mongodb.MongoWriteException
 import com.mongodb.client.model.Filters.and
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.conversions.Bson
-import org.litote.kmongo.EMPTY_BSON
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.eq
-import org.litote.kmongo.gte
-import org.litote.kmongo.lte
 import java.time.LocalDate
 
 data class Group(
@@ -111,6 +108,17 @@ suspend fun CoroutineCollection<Statistic>.rangeClickTime(
         *filters
     )
 ).toList().sumClick()
+
+suspend fun CoroutineCollection<Statistic>.click(group: String, name: String) =
+    updateOne(
+        and(
+            Statistic::date eq LocalDate.now(),
+            Statistic::group eq group,
+            Statistic::name eq name
+        ),
+        inc(Statistic::time, 1),
+        upsert()
+    )
 
 fun List<Statistic>.sumClick() = map { it.time }.sum()
 
