@@ -16,6 +16,7 @@ import org.litote.kmongo.reactivestreams.KMongo
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 object ServerConfig {
+    const val MONGODB_PORT = 27000
     var TESTING = false
 }
 
@@ -53,5 +54,9 @@ fun Application.installFeatures() = run {
 }
 
 val module = module {
-    single { KMongo.createClient("mongodb://localhost:27000").coroutine }
+    single {
+        KMongo.createClient(
+            "mongodb://localhost:${ServerConfig.MONGODB_PORT}"
+        ).coroutine
+    }
 }
