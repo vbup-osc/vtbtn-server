@@ -21,11 +21,13 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 var sum = 0
+
                 mongo.forVtuber(vtb).statistics().find()
                     .toList()
                     .forEach {
                         sum += it.time
                     }
+
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
@@ -40,11 +42,13 @@ fun Route.statisticsRoutes() {
                 val vtb = param("vtb")
                 val group = param("group")
                 var sum = 0
+
                 mongo.forVtuber(vtb).statistics().find(Statistic::group eq group)
                     .toList()
                     .forEach {
                         sum += it.time
                     }
+
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
@@ -60,11 +64,13 @@ fun Route.statisticsRoutes() {
                 val vtb = param("vtb")
                 val voiceName = param("voice")
                 var sum = 0
+
                 mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName)
                     .toList()
                     .forEach {
                         sum += it.time
                     }
+
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
@@ -81,11 +87,13 @@ fun Route.statisticsRoutes() {
                 val voiceName = param("voice")
                 val startTime = LocalDate.parse(param("start"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 var sum = 0
+
                 mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName, Statistic::date eq startTime)
                     .toList()
                     .forEach {
                         sum += it.time
                     }
+
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
@@ -104,6 +112,7 @@ fun Route.statisticsRoutes() {
                 val startTime = LocalDate.parse(param("start"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 val endTime = LocalDate.parse(param("end"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 var sum = 0
+
                 mongo.forVtuber(vtb).statistics().find(
                     Statistic::name eq voiceName,
                     Statistic::date gte startTime,
@@ -113,6 +122,7 @@ fun Route.statisticsRoutes() {
                     .forEach {
                         sum += it.time
                     }
+
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
