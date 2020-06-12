@@ -1,16 +1,19 @@
 package com.oruyanke.vtbs
 
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import org.koin.ktor.ext.inject
-import org.litote.kmongo.*
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.eq
+import org.litote.kmongo.inc
+import org.litote.kmongo.upsert
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 fun Route.statisticsRoutes() {
@@ -20,18 +23,12 @@ fun Route.statisticsRoutes() {
         get("/{vtb}") {
             errorAware {
                 val vtb = param("vtb")
-                var sum = 0
-
-                mongo.forVtuber(vtb).statistics().find()
-                    .toList()
-                    .forEach {
-                        sum += it.time
-                    }
+                val sum = mongo.forVtuber(vtb).statistics().totalClicked()
 
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
-                        "clickTimes" to sum
+                        "click" to sum
                     )
                 )
             }
@@ -41,19 +38,13 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
-                var sum = 0
-
-                mongo.forVtuber(vtb).statistics().find(Statistic::group eq group)
-                    .toList()
-                    .forEach {
-                        sum += it.time
-                    }
+                val sum = mongo.forVtuber(vtb).statistics().groupClicked(group)
 
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
                         "group" to group,
-                        "finalClickTimes" to sum
+                        "click" to sum
                     )
                 )
             }
@@ -62,80 +53,33 @@ fun Route.statisticsRoutes() {
         get("/{vtb}/{group}/{voice}") {
             errorAware {
                 val vtb = param("vtb")
+                val group = param("group")
                 val voiceName = param("voice")
-                var sum = 0
 
-                mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName)
-                    .toList()
-                    .forEach {
-                        sum += it.time
-                    }
+                val startTime = queryTimeOrEpoch("from")
+                val endTime = queryTimeOrNow("to")
 
-                call.respond(
-                    mapOf(
-                        "vtuber" to vtb,
-                        "name" to voiceName,
-                        "finalClickTimes" to sum
-                    )
-                )
-            }
-        }
-
-        get("/{vtb}/{group}/{voice}/{start}") {
-            errorAware {
-                val vtb = param("vtb")
-                val voiceName = param("voice")
-                val startTime = LocalDate.parse(param("start"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                var sum = 0
-
-                mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName, Statistic::date eq startTime)
-                    .toList()
-                    .forEach {
-                        sum += it.time
-                    }
-
-                call.respond(
-                    mapOf(
-                        "vtuber" to vtb,
-                        "name" to voiceName,
-                        "requestDate" to param("start"),
-                        "dayClickTimes" to sum
-                    )
-                )
-            }
-        }
-
-        get("/{vtb}/{group}/{voice}/{start}/{end}") {
-            errorAware {
-                val vtb = param("vtb")
-                val voiceName = param("voice")
-                val startTime = LocalDate.parse(param("start"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val endTime = LocalDate.parse(param("end"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                var sum = 0
-
-                mongo.forVtuber(vtb).statistics().find(
+                val sum = mongo.forVtuber(vtb).statistics().rangeClicked(
+                    startTime,
+                    endTime,
                     Statistic::name eq voiceName,
-                    Statistic::date gte startTime,
-                    Statistic::date lte endTime
+                    Statistic::group eq group
                 )
-                    .toList()
-                    .forEach {
-                        sum += it.time
-                    }
 
                 call.respond(
                     mapOf(
                         "vtuber" to vtb,
                         "name" to voiceName,
-                        "start" to param("start"),
-                        "end" to param("end"),
-                        "sumClickTimes" to sum
+                        "group" to group,
+                        "from" to startTime.toHumanReadable(),
+                        "to" to endTime.toHumanReadable(),
+                        "click" to sum
                     )
                 )
             }
         }
 
-        post<PlusOneRequest>("/{vtb}") {
+        post<PlusOneRequest>("/{vtb}/click") {
             errorAware {
                 val vtb = param("vtb")
                 mongo.forVtuber(vtb).statistics().updateOne(
@@ -147,7 +91,7 @@ fun Route.statisticsRoutes() {
                     inc(Statistic::time, 1),
                     upsert()
                 )
-
+                call.respond(HttpStatusCode.OK)
             }
         }
     }

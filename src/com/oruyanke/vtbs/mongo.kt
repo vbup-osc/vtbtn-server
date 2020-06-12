@@ -1,11 +1,16 @@
 package com.oruyanke.vtbs
 
 import com.mongodb.MongoWriteException
+import com.mongodb.client.model.Filters.and
 import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.conversions.Bson
+import org.litote.kmongo.EMPTY_BSON
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.gte
+import org.litote.kmongo.lte
 import java.time.LocalDate
 
 data class Group(
@@ -88,6 +93,26 @@ suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
 
 fun CoroutineCollection<Voice>.byGroup(group: String) =
     find(Voice::group eq group)
+
+suspend fun CoroutineCollection<Statistic>.groupClicked(group: String) =
+    find(Statistic::group eq group).toList().sumClick()
+
+suspend fun CoroutineCollection<Statistic>.totalClicked() =
+    find().toList().sumClick()
+
+suspend fun CoroutineCollection<Statistic>.rangeClicked(
+    from: LocalDate,
+    to: LocalDate,
+    vararg filters: Bson = arrayOf(EMPTY_BSON)
+) = find(
+    and(
+        Statistic::date gte from,
+        Statistic::date lte to,
+        *filters
+    )
+).toList().sumClick()
+
+fun List<Statistic>.sumClick() = map { it.time }.sum()
 
 private object MongoErrorCodes {
     const val KEY_DUPLICATE = 11000
