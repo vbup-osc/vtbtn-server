@@ -6,8 +6,7 @@ import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
-import org.litote.kmongo.inc
-import org.litote.kmongo.upsert
+import java.time.LocalDate
 
 data class Group(
     @BsonId val name: String,
@@ -22,7 +21,7 @@ data class Voice(
 )
 
 data class Statistic(
-    val date: String,
+    val date: LocalDate,
     val name: String,
     val time: Int,
     val group: String
@@ -33,9 +32,6 @@ fun Group.toResponseWith(voices: List<VoiceResponse>) =
 
 fun Voice.toResponse() =
     VoiceResponse(name, url, group, desc.toLocalizedMap())
-
-fun Statistic.toResponse() =
-    StatisticResponse(date, name, time, group)
 
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
@@ -86,18 +82,6 @@ suspend fun CoroutineCollection<Group>.addGroup(group: Group) =
 suspend fun CoroutineCollection<Group>.byName(name: String) =
     findOneById(name)
         ?: throw BadRequestException("Group '$name' not found")
-
-suspend fun CoroutineCollection<Statistic>.plusOne(statistic: PlusOneRequest) =
-    updateOne(
-    org.litote.kmongo.and(
-        Statistic::date eq statistic.date,
-        Statistic::group eq statistic.group,
-        Statistic::name eq statistic.name
-    ),
-    inc(Statistic::time, 1),
-    upsert()
-)
-
 
 suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
     insertOrBadRequest(voice) { "Voice '${voice.name}' already exists in group '${voice.group}'" }

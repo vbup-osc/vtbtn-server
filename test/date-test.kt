@@ -1,12 +1,13 @@
 package com.oruyanke.vtbs
 
-import org.litote.kmongo.MongoOperator
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 
 fun main() {
-    val date = SimpleDateFormat("yyyy/M/dd").format(Date()).toString()
-    println()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse("2020-01-01", formatter)
+    println(LocalDate.now())
 
 }
 
