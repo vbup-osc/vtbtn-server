@@ -52,5 +52,5 @@ fun Application.installFeatures() = run {
 }
 
 val module = module {
-    single { KMongo.createClient("mongodb://localhost:27017").coroutine }
+    single { KMongo.createClient("mongodb://localhost:27000").coroutine }
 }

@@ -12,16 +12,13 @@ fun Route.statisticsRoute() {
     val mongo: CoroutineClient by inject()
 
     route("/statistics") {
-        get("/") {
+        get("/{vtb}/statistic") {
 
         }
-        get("/{vtb}") {
+        get("/{vtb}/statistic/{group}") {
 
         }
-        get("/{vtb}/{group}") {
-
-        }
-        get("/{vtb}/{group}/{name}") {
+        get("/{vtb}/statistic/{name}") {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
@@ -33,7 +30,7 @@ fun Route.statisticsRoute() {
             }
         }
 
-        post("/{vtb}/{group}/{name}") {
+        post("/{vtb}/statistic/{name}") {
 
         }
 
