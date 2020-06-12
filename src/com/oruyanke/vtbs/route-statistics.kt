@@ -53,10 +53,10 @@ fun Route.statisticsRoutes() {
             }
         }
 
-        get("/{vtb}/{name}") {
+        get("/{vtb}/{group}/{voice}") {
             errorAware {
                 val vtb = param("vtb")
-                val voiceName = param("name")
+                val voiceName = param("voice")
                 var sum = 0
                 mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName)
                     .toList()
