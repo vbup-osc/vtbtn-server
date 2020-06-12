@@ -20,7 +20,8 @@ GET /vtubers
 ##### 返回数据
 ```json
 {
-  "name": "path"
+  "name": "path",
+   ...
 }
 ```
 
@@ -47,14 +48,53 @@ GET /vtubers/:name
 |:---:|:----:|
 |name|Vtuber 的名字|
 
-`// TODO`
+##### 返回数据
+```json
+{
+  "name": "Vtuber 的名字",
+  "groups": [ group, group, ... ]
+}
+```
+
+每一个 `group` 都具有如下的结构
+```json
+{
+    "name": "组的名字",
+    "desc": {
+        "zh": "中文翻译",
+        "en": "英文翻译",
+        "ja": "日文翻译"
+    },
+    "voices": [ voice, voice, ... ]
+}
+```
+
+每一个 `voice` 都具有如下的结构
+```json
+{
+    "name": "音频名字",
+    "url": "音频路径",
+    "group": "音频所属组",
+    "desc": {
+        "zh": "中文翻译",
+        "en": "英文翻译",
+        "ja": "日文翻译"
+    }
+}
+```
 
 #### 获取某个 Vtuber 的某一分组下的所有语音
 ```http request
 GET /vtubers/:name/:group
 ```
 
-`// TODO`
+|参数|说明|
+|:---:|:----:|
+|name|Vtuber 的名字|
+|group|组名|
+
+##### 返回数据
+返回的数据为一个 `group` （关于 `group` 的结构请查看上文）
 
 ### 统计数据相关 API
 
