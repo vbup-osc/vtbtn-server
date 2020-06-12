@@ -8,6 +8,8 @@ data class VoiceResponse(val name: String, val url: String, val group: String, v
 
 data class StatisticResponse(val date: String, val name: String, val time: Int, val group: String)
 
+data class PlusOneRequest(val name: String, val date: String, val group: String)
+
 data class AddVoiceRequest(val name: String, val url: String, val desc: Map<String, String>)
 
 data class AddGroupRequest(val name: String, val desc: Map<String, String>)

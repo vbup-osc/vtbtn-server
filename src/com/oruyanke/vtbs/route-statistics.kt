@@ -1,6 +1,7 @@
 package com.oruyanke.vtbs
 
 import io.ktor.application.call
+import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -10,10 +11,7 @@ import org.koin.ktor.ext.inject
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.eq
 import org.litote.kmongo.inc
-import org.litote.kmongo.setValue
 import org.litote.kmongo.upsert
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 fun Route.statisticsRoutes() {
@@ -21,44 +19,74 @@ fun Route.statisticsRoutes() {
 
     route("/statistics") {
         get("/{vtb}") {
-            call.respond("Hello, world")
-
+            errorAware {
+                val vtb = param("vtb")
+                var sum: Int = 0
+                mongo.forVtuber(vtb).statistics().find()
+                        .toList()
+                        .forEach {
+                            sum += it.time
+                        }
+                call.respond(
+                        mapOf(
+                                "vtuber" to vtb,
+                                "clickTimes" to sum
+                        )
+                )
+            }
         }
         get("/{vtb}/{group}") {
-            val vtb = param("vtb")
-            val group = param("group")
-
-            val db = mongo.forVtuber(vtb)
-            val groupInfo = db.statistics()
+            errorAware {
+                val vtb = param("vtb")
+                val group = param("group")
+                var sum: Int = 0
+                mongo.forVtuber(vtb).statistics().find(Statistic::group eq group)
+                        .toList()
+                        .forEach {
+                            sum += it.time
+                        }
+                call.respond(
+                        mapOf(
+                                "vtuber" to vtb,
+                                "group" to group,
+                                "clickTimes" to sum
+                        )
+                )
+            }
         }
         get("/{vtb}/{name}") {
             errorAware {
                 val vtb = param("vtb")
                 val voiceName = param("name")
-
-                val db = mongo.forVtuber(vtb)
-                val voiceInfo = db.statistics()
-                call.respond("Hello")
+                var sum: Int = 0
+                mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName)
+                        .toList()
+                        .forEach {
+                            sum += it.time
+                        }
+                call.respond(
+                        mapOf(
+                                "vtuber" to vtb,
+                                "name" to voiceName,
+                                "clickTimes" to sum
+                        )
+                )
             }
         }
 
-        post("/{vtb}/{group}/{name}") {
+        post<PlusOneRequest>("/{vtb}") {
             errorAware {
-                val date = SimpleDateFormat("yyyy/M/dd").format(Date()).toString()
                 val vtb = param("vtb")
-                val group = param("group")
-                val voiceName = param("name")
                 mongo.forVtuber(vtb).statistics().updateOne(
                         org.litote.kmongo.and(
-                                Statistic::date eq date,
-                                Statistic::group eq group,
-                                Statistic::name eq voiceName
+                                Statistic::date eq it.date,
+                                Statistic::group eq it.group,
+                                Statistic::name eq it.name
                         ),
                         inc(Statistic::time, 1),
                         upsert()
                 )
             }
         }
-
     }
 }

@@ -23,7 +23,7 @@ data class Voice(
 )
 
 data class Statistic(
-    @BsonId val date: String,
+    val date: String,
     val name: String,
     val time: Int,
     val group: String
