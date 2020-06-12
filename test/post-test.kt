@@ -65,7 +65,7 @@ class PostTest {
                     ).json
                 )
             }.apply {
-//                assertEquals(HttpStatusCode.OK, response.status())
+                assertEquals(HttpStatusCode.OK, response.status())
             }
         }
     }
@@ -81,7 +81,7 @@ class PostTest {
                     ).json
                 )
             }.apply {
-//                assertEquals(HttpStatusCode.OK, response.status())
+                assertEquals(HttpStatusCode.OK, response.status())
             }
         }
     }

@@ -2,10 +2,12 @@ package com.oruyanke.vtbs
 
 import com.mongodb.MongoWriteException
 import org.bson.codecs.pojo.annotations.BsonId
+import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import java.text.SimpleDateFormat
 import java.util.*
 
 data class Group(
@@ -21,7 +23,7 @@ data class Voice(
 )
 
 data class Statistic(
-    @BsonId val date: Date,
+    @BsonId val date: String,
     val name: String,
     val time: Int,
     val group: String
@@ -34,7 +36,7 @@ fun Voice.toResponse() =
     VoiceResponse(name, url, group, desc.toLocalizedMap())
 
 fun Statistic.toResponse() =
-    StatisticResponse(name, date, group)
+    StatisticResponse(date, name, time, group)
 
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
@@ -86,8 +88,8 @@ suspend fun CoroutineCollection<Group>.byName(name: String) =
     findOneById(name)
         ?: throw BadRequestException("Group '$name' not found")
 
-//suspend fun CoroutineCollection<Statistic>.plusOne(date: Date,name: String)=
-//        findOneAndUpdate(date,name,{time++})
+//suspend fun CoroutineCollection<Statistic>.plusOne(statistic: Statistic)=
+//   if ()
 
 
 suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =

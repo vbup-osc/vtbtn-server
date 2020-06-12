@@ -6,7 +6,7 @@ data class GroupResponse(val name: String, val desc: Map<String, String>, var vo
 
 data class VoiceResponse(val name: String, val url: String, val group: String, val desc: Map<String, String>)
 
-data class StatisticResponse(val name: String, val date: Date, val group: String)
+data class StatisticResponse(val date: String, val name: String, val time: Int, val group: String)
 
 data class AddVoiceRequest(val name: String, val url: String, val desc: Map<String, String>)
 
