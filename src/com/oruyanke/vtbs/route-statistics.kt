@@ -130,7 +130,7 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 mongo.forVtuber(vtb).statistics().updateOne(
-                        org.litote.kmongo.and(
+                        and(
                                 Statistic::date eq LocalDate.now(),
                                 Statistic::name eq it.name,
                                 Statistic::group eq it.group
