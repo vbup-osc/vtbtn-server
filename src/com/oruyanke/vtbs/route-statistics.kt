@@ -1,7 +1,6 @@
 package com.oruyanke.vtbs
 
 import io.ktor.application.call
-import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -21,7 +20,7 @@ fun Route.statisticsRoutes() {
         get("/{vtb}") {
             errorAware {
                 val vtb = param("vtb")
-                var sum: Int = 0
+                var sum = 0
                 mongo.forVtuber(vtb).statistics().find()
                         .toList()
                         .forEach {
@@ -39,7 +38,7 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
-                var sum: Int = 0
+                var sum = 0
                 mongo.forVtuber(vtb).statistics().find(Statistic::group eq group)
                         .toList()
                         .forEach {
@@ -58,7 +57,7 @@ fun Route.statisticsRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val voiceName = param("name")
-                var sum: Int = 0
+                var sum = 0
                 mongo.forVtuber(vtb).statistics().find(Statistic::name eq voiceName)
                         .toList()
                         .forEach {
