@@ -1,4 +1,4 @@
 vtbtn-server
 =====================
 
-All-in-one server for all vtb-button projects.
+The all-in-one server for all vtb-button projects.
