@@ -10,7 +10,7 @@ RUN useradd $APPLICATION_USER \
     && echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse" >> /etc/apt/sources.list \
     && echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse" >> /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -y openjdk-8-jre-headless
+    && apt-get install -y openjdk-11-jre-headless
 
 USER $APPLICATION_USER
 
