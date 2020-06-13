@@ -34,7 +34,7 @@ class ExternalVoice {
 class PostTest {
     @Test
     fun testPost() {
-        val file = "C:\\Users\\kiva\\Desktop\\fbk-voices-test.json"
+        val file = "/Users/yangjinghua/mea-voices-test.json"
         val mapper = ObjectMapper()
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
@@ -55,7 +55,7 @@ class PostTest {
 
     private fun addVoice(voice: Voice) {
         withTestApplication({ module(testing = true) }) {
-            handleRequest(HttpMethod.Post, "/vtubers/fubuki/${voice.group}/add-voice") {
+            handleRequest(HttpMethod.Post, "/vtubers/mea/${voice.group}/add-voice") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(
                     mapOf(
@@ -72,7 +72,7 @@ class PostTest {
 
     private fun addGroup(group: Group) {
         withTestApplication({ module(testing = true) }) {
-            handleRequest(HttpMethod.Post, "/vtubers/fubuki/add-group") {
+            handleRequest(HttpMethod.Post, "/vtubers/mea/add-group") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(
                     mapOf(

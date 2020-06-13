@@ -1,11 +1,14 @@
 package com.oruyanke.vtbs
 
 import com.mongodb.MongoWriteException
+import com.mongodb.client.model.Filters.and
 import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.conversions.Bson
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.eq
+import java.time.LocalDate
 
 data class Group(
     @BsonId val name: String,
@@ -17,6 +20,13 @@ data class Voice(
     val url: String,
     val group: String,
     val desc: List<LocalizedText>
+)
+
+data class Statistic(
+    val date: LocalDate,
+    val name: String,
+    val time: Int,
+    val group: String
 )
 
 fun Group.toResponseWith(voices: List<VoiceResponse>) =
@@ -53,6 +63,8 @@ fun CoroutineDatabase.groups() = this.getCollection<Group>("groups")
 
 fun CoroutineDatabase.voices() = this.getCollection<Voice>("voices")
 
+fun CoroutineDatabase.statistics() = this.getCollection<Statistic>("statistics")
+
 private suspend inline fun <reified T : Any> CoroutineCollection<T>.insertOrBadRequest(
     data: T,
     message: () -> String
@@ -78,6 +90,31 @@ suspend fun CoroutineCollection<Voice>.addVoice(voice: Voice) =
 
 fun CoroutineCollection<Voice>.byGroup(group: String) =
     find(Voice::group eq group)
+
+suspend fun CoroutineCollection<Statistic>.rangeClickTime(
+    from: LocalDate,
+    to: LocalDate,
+    vararg filters: Bson = arrayOf(EMPTY_BSON)
+) = find(
+    and(
+        Statistic::date gte from,
+        Statistic::date lte to,
+        *filters
+    )
+).toList().sumClick()
+
+suspend fun CoroutineCollection<Statistic>.click(group: String, name: String) =
+    updateOne(
+        and(
+            Statistic::date eq LocalDate.now(),
+            Statistic::group eq group,
+            Statistic::name eq name
+        ),
+        inc(Statistic::time, 1),
+        upsert()
+    )
+
+fun List<Statistic>.sumClick() = map { it.time }.sum()
 
 private object MongoErrorCodes {
     const val KEY_DUPLICATE = 11000
