@@ -100,3 +100,8 @@ fun Route.statisticsRoutes() {
         }
     }
 }
+
+private data class PlusOneRequest(
+    val name: String,
+    val group: String
+)

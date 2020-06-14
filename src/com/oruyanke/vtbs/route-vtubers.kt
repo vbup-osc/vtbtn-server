@@ -91,3 +91,38 @@ fun Route.vtuberRoutes() {
         }
     }
 }
+
+private data class GroupResponse(
+    val name: String,
+    val desc: Map<String, String>,
+    val voices: List<VoiceResponse>
+)
+
+private data class VoiceResponse(
+    val name: String,
+    val url: String,
+    val group: String,
+    val desc: Map<String, String>
+)
+
+private data class AddVoiceRequest(
+    val name: String,
+    val url: String,
+    val desc: Map<String, String>
+)
+
+private data class AddGroupRequest(
+    val name: String,
+    val desc: Map<String, String>
+)
+
+private fun Map<String, String>.toLocalizedTexts() =
+    this.map { LocalizedText(it.key, it.value) }
+        .toList()
+
+private fun Group.toResponseWith(voices: List<VoiceResponse>) =
+    GroupResponse(name, desc.toLocalizedMap(), voices)
+
+private fun Voice.toResponse() =
+    VoiceResponse(name, url, group, desc.toLocalizedMap())
+

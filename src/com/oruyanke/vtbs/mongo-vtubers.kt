@@ -18,12 +18,6 @@ data class Voice(
     val desc: List<LocalizedText>
 )
 
-fun Group.toResponseWith(voices: List<VoiceResponse>) =
-    GroupResponse(name, desc.toLocalizedMap(), voices)
-
-fun Voice.toResponse() =
-    VoiceResponse(name, url, group, desc.toLocalizedMap())
-
 data class LocalizedText(val lang: String, val text: String) {
     companion object {
         @JvmStatic
