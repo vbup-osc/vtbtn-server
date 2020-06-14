@@ -98,4 +98,6 @@ GET /vtubers/:name/:group
 
 ### 统计数据相关 API
 
+### 管理权限相关 API
+
 
