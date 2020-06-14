@@ -13,7 +13,11 @@ import io.ktor.util.date.GMTDate
 import io.ktor.util.date.Month
 import io.ktor.utils.io.core.toByteArray
 import org.koin.ktor.ext.inject
+import org.litote.kmongo.addEachToSet
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.eq
+import org.litote.kmongo.pullAll
+import org.litote.kmongo.updateOne
 import java.security.MessageDigest
 import java.time.LocalDate
 import java.util.*
@@ -28,7 +32,8 @@ fun Route.userRoutes() {
                 val user = sessionUser(mongo)
                 call.respond(
                     mapOf(
-                        "msg" to "Hello! ${user.uid}"
+                        "msg" to "Hello! ${user.uid}",
+                        "admin" to user.adminVtubers
                     )
                 )
             }
@@ -71,11 +76,32 @@ fun Route.userRoutes() {
                 val user = User(
                     uid = it.uid,
                     verified = false,
+                    isRoot = false,
+                    adminVtubers = listOf(),
                     userProfile = profileId,
                     userSecurity = securityId
                 )
 
                 mongo.userDB().users().newUser(user)
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        post<ChangeAdminVtuberRequest>("/change-admin-vtuber") {
+            errorAware {
+                sessionUser(mongo).mustBeRoot()
+
+                mongo.userDB().users().bulkWrite(
+                    updateOne(
+                        User::uid eq it.uid,
+                        addEachToSet(User::adminVtubers, it.add ?: listOf())
+                    ),
+                    updateOne(
+                        User::uid eq it.uid,
+                        pullAll(User::adminVtubers, it.remove ?: listOf())
+                    )
+                )
+
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -92,6 +118,12 @@ private data class RegisterRequest(
     val password: String,
     val name: String,
     val email: String
+)
+
+private data class ChangeAdminVtuberRequest(
+    val uid: String,
+    val add: List<String>?,
+    val remove: List<String>?
 )
 
 private fun String.withSalt(salt: String) = this + salt
@@ -113,3 +145,7 @@ private fun ByteArray.toHexString() =
 private fun LocalDate.toHttpDate() =
     GMTDate(0, 0, 0, dayOfMonth, Month.from(monthValue), year)
         .toHttpDate()
+
+private fun User.mustBeRoot() {
+    if (!this.isRoot) throw RootRequiredException()
+}

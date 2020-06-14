@@ -11,6 +11,8 @@ import java.time.LocalDate
 data class User(
     @BsonId val uid: String,
     val verified: Boolean,
+    val isRoot: Boolean,
+    val adminVtubers: List<String>,
     val userSecurity: ObjectId,
     val userProfile: ObjectId
 )
@@ -66,6 +68,9 @@ suspend fun CoroutineCollection<User>.hasUser(uid: String) =
     findOneById(uid) != null
 
 suspend fun CoroutineCollection<User>.newUser(user: User) = insertOne(user)
+
+suspend fun CoroutineCollection<User>.byUID(uid: String) =
+    findOneById(uid) ?: throw UserNotFoundException(uid, "?")
 
 suspend fun CoroutineCollection<UserSession>.getSession(sessionId: String): UserSession {
     val session = findOneById(ObjectId(sessionId)) ?: throw SessionNotFoundException()

@@ -41,3 +41,12 @@ class SessionNotFoundException : AuthRequiredException("Session not found")
 class SessionExpiredException : AuthRequiredException("Session expired")
 
 class InvalidSessionException : AuthRequiredException("Invalid session")
+
+open class PermissionDenied(msg: String = "Permission denied") : ResponseException(
+    HttpStatusCode.Forbidden,
+    msg
+)
+
+class RootRequiredException : PermissionDenied(
+    "You are not root :)"
+)
