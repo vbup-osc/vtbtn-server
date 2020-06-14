@@ -6,6 +6,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.util.pipeline.PipelineContext
+import org.litote.kmongo.coroutine.CoroutineClient
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -23,7 +24,7 @@ suspend fun <R> PipelineContext<*, ApplicationCall>.errorAware(block: suspend ()
 
 suspend fun ApplicationCall.respondError(code: HttpStatusCode, msg: String) =
     this.respondText(
-        """{"code": 1, "msg":"$msg"""",
+        """{"code": 1, "msg":"$msg"}""",
         ContentType.Application.Json,
         code
     )
@@ -42,5 +43,15 @@ fun PipelineContext<*, ApplicationCall>.queryTimeOrEpoch(name: String): LocalDat
 fun PipelineContext<*, ApplicationCall>.queryTimeOrNow(name: String): LocalDate =
     queryTime(name) ?: LocalDate.now()
 
-fun LocalDate.toHumanReadable() : String =
+fun PipelineContext<*, ApplicationCall>.sessionId(): String =
+    call.request.cookies[UserConfig.SESSION_ID] ?: throw AuthRequiredException()
+
+suspend fun PipelineContext<*, ApplicationCall>.sessionUser(mongo: CoroutineClient): User {
+    val sessionId = sessionId()
+    val db = mongo.userDB()
+    val session = db.sessions().getSession(sessionId)
+    return db.users().bySession(session)
+}
+
+fun LocalDate.toHumanReadable(): String =
     this.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

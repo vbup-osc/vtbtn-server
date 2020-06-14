@@ -21,6 +21,7 @@ object ServerConfig {
 }
 
 @ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
@@ -30,6 +31,7 @@ fun Application.module(testing: Boolean = false) {
     routing {
         vtuberRoutes()
         statisticsRoutes()
+        userRoutes()
     }
 }
 
