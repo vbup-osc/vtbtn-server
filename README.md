@@ -93,7 +93,7 @@ GET /vtubers/:name/:group
 
 #### 新增一个组 (Group)
 ```http request
-GET /vtubers/:name/add-group
+POST /vtubers/:name/add-group
 ```
 
 该操作会在 Vtuber 名为 `:name` 的语音数据库中新增一个组。
@@ -132,7 +132,7 @@ GET /vtubers/:name/add-group
 
 #### 新增一条语音 (Voice)
 ```http request
-GET /vtubers/:name/:group/add-voice
+POST /vtubers/:name/:group/add-voice
 ```
 
 该操作会在 Vtuber 名为 `:name` 的语音数据库中新增一条语音，并且该语音的组被设置为 `:group`。
