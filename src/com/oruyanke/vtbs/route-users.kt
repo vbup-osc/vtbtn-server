@@ -49,7 +49,7 @@ fun Route.userRoutes() {
 
                 val session = mongo.userDB().sessions().newSession(it.uid)
                 val expire = session.expireDate().toHttpDate()
-                val cookie = "${UserConfig.SESSION_ID}=${session._id!!}; Expires=$expire; HttpOnly"
+                val cookie = "${UserConfig.SESSION_ID}=${session._id!!}; Path=/; Expires=$expire; HttpOnly"
                 call.response.header("Set-Cookie", cookie)
                 call.respond(HttpStatusCode.OK)
             }

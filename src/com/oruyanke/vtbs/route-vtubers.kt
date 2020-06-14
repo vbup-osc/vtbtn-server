@@ -64,6 +64,8 @@ fun Route.vtuberRoutes() {
         post<AddGroupRequest>("/{vtb}/add-group") {
             errorAware {
                 val vtb = param("vtb")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
+
                 mongo.forVtuber(vtb).groups().addGroup(
                     Group(
                         name = it.name,
@@ -78,6 +80,8 @@ fun Route.vtuberRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
+
                 mongo.forVtuber(vtb).voices().addVoice(
                     Voice(
                         name = it.name,

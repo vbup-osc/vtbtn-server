@@ -12,3 +12,9 @@ fun UserSession.expireDate(): LocalDate =
 
 fun UserSession.isExpired() =
     this.expireDate() < LocalDate.now()
+
+fun User.mustBeTheAdminOf(vtuber: String) {
+    if (!isRoot && vtuber !in adminVtubers) {
+        throw PermissionDenied("You have no permission for vtuber '$vtuber'")
+    }
+}
