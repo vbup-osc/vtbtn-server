@@ -32,8 +32,7 @@ fun Route.userRoutes() {
                 val user = sessionUser(mongo)
                 call.respond(
                     mapOf(
-                        "msg" to "Hello! ${user.uid}",
-                        "admin" to user.adminVtubers
+                        "msg" to "Hello! ${user.uid}"
                     )
                 )
             }
