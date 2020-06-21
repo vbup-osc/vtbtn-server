@@ -6,7 +6,50 @@ vtbtn-server
 - 按钮数据
 - 统计数据
 
-## 使用方法
+## 运行
+
+### 从 DockerHub
+- 拉取 Docker 镜像
+```shell script
+docker pull imkiva/vtbtn-server
+```
+
+- 创建数据目录
+```shell script
+mkdir /path/to/data/dir
+```
+
+- 启动容器
+```shell script
+docker run -d -p 8080:8080 -v <数据目录>:/data/db imkiva/vtbtn-server
+```
+
+服务器将被启动在 `localhost:8080`
+
+### 从源码
+- 编译项目并打包
+```shell script
+./gradlew shadowJar
+```
+
+- 编译 Docker 镜像
+```shell script
+docker build -t imkiva/vtbtn-server:latest .
+```
+
+- 启动容器
+```shell script
+docker run -d -p 8080:8080 -v <数据目录>:/data/db imkiva/vtbtn-server
+```
+
+## 开发
+
+我们使用 [JetBrains](https://www.jetbrains.com/?from=KiVM) 提供的 [Intellij IDEA](https://www.jetbrains.com/idea/?from=KiVM).
+进行开发。我们相信，这是世界上最棒的 IDE.
+
+[<img src="logo/jetbrains.png" width="200"/>](https://www.jetbrains.com/?from=KiVM)
+
+## API 文档
 
 API 采用 RESTful 风格设计，请求和响应的数据格式一律为 `application/json`
 
