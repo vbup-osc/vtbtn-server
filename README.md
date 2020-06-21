@@ -173,6 +173,13 @@ POST /vtubers/:name/:group/add-voice
 
 ### 统计数据相关 API
 
+所有统计数据 API 均支持以下 Query Parameters
+
+|参数|说明|
+|:---:|:----:|
+|from|起始时间|
+|to|结束时间|
+
 #### 总体统计数据
 ```http request
 GET /statistics/:name
