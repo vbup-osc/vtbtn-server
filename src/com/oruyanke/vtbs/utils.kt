@@ -3,12 +3,30 @@ package com.oruyanke.vtbs
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.request.receive
 import io.ktor.response.respondText
+import io.ktor.routing.Route
+import io.ktor.routing.route
+import io.ktor.util.pipeline.ContextDsl
 import io.ktor.util.pipeline.PipelineContext
 import org.litote.kmongo.coroutine.CoroutineClient
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+@ContextDsl
+@JvmName("patchTyped")
+inline fun <reified R : Any> Route.patch(
+    path: String,
+    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(R) -> Unit
+): Route {
+    return route(path, HttpMethod.Patch) {
+        handle {
+            body(call.receive())
+        }
+    }
+}
 
 suspend fun <R> PipelineContext<*, ApplicationCall>.errorAware(block: suspend () -> R): R? {
     return try {

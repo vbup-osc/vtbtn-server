@@ -4,12 +4,13 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.path
 import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
+import io.ktor.routing.*
 import org.koin.ktor.ext.inject
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.eq
+import org.litote.kmongo.setValue
+import org.litote.kmongo.updateOne
 
 fun Route.vtuberRoutes() {
     val mongo: CoroutineClient by inject()
@@ -93,6 +94,59 @@ fun Route.vtuberRoutes() {
                 call.respond(HttpStatusCode.OK)
             }
         }
+
+        patch<PatchVoiceRequest>("/{vtb}/{group}/{name}") {
+            errorAware {
+                val vtb = param("vtb")
+                val group = param("group")
+                val name = param("name")
+
+                mongo.forVtuber(vtb).voices().bulkWrite(
+                    it.toBulkWriteOperations(group, name)
+                )
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        patch<PatchGroupRequest>("/{vtb}/{group}") {
+            errorAware {
+                val vtb = param("vtb")
+                val group = param("group")
+
+                mongo.forVtuber(vtb).groups().bulkWrite(
+                    it.toBulkWriteOperations(group)
+                )
+
+                if (it.name != null) {
+                    mongo.forVtuber(vtb).voices().updateMany(
+                        Voice::group eq group,
+                        setValue(Voice::group, it.name)
+                    )
+                }
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        delete("/{vtb}/{group}/{name}") {
+            errorAware {
+                val vtb = param("vtb")
+                val name = param("name")
+
+                mongo.forVtuber(vtb).voices().deleteOneById(name)
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        delete("/{vtb}/{group}") {
+            errorAware {
+                val vtb = param("vtb")
+                val group = param("group")
+
+                mongo.forVtuber(vtb).groups().deleteOneById(group)
+                mongo.forVtuber(vtb).voices().deleteMany(Voice::group eq group)
+                call.respond(HttpStatusCode.OK)
+            }
+        }
     }
 }
 
@@ -119,6 +173,46 @@ private data class AddGroupRequest(
     val name: String,
     val desc: Map<String, String>
 )
+
+private data class PatchVoiceRequest(
+    val name: String?,
+    val group: String?,
+    val url: String?,
+    val desc: Map<String, String>?
+)
+
+private data class PatchGroupRequest(
+    val name: String?,
+    val desc: Map<String, String>?
+)
+
+private fun PatchVoiceRequest.toBulkWriteOperations(group: String, name: String) =
+    mapOf(
+        Voice::name to this.name,
+        Voice::group to this.group,
+        Voice::url to this.url,
+        Voice::desc to this.desc
+    )
+        .filterValues { it != null }
+        .map {
+            updateOne<Voice>(
+                and(Voice::name eq name, Voice::group eq group),
+                setValue(it.key, it.value)
+            )
+        }
+
+private fun PatchGroupRequest.toBulkWriteOperations(group: String) =
+    mapOf(
+        Group::name to this.name,
+        Group::desc to this.desc
+    )
+        .filterValues { it != null }
+        .map {
+            updateOne<Group>(
+                Group::name eq group,
+                setValue(it.key, it.value)
+            )
+        }
 
 private fun Map<String, String>.toLocalizedTexts() =
     this.map { LocalizedText(it.key, it.value) }
