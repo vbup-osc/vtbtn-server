@@ -173,6 +173,127 @@ POST /vtubers/:name/:group/add-voice
 
 ### 统计数据相关 API
 
+#### 总体统计数据
+```http request
+GET /statistics/:name
+```
+|参数|说明|
+|:---:|:----:|
+|name|Vtuber 的名字|
+
+响应
+```json
+{
+    "vtuber": "<Vtuber的名字>",
+    "from": "<开始时间>",
+    "to": "<当前时间>",
+    "click": "<点击次数>"
+}
+```
+例如
+```json
+{
+    "vtuber": "fubuki",
+    "from": "1970-01-01",
+    "to": "2020-06-15",
+    "click": 2
+}
+```
+说明名叫`fubuki`的Vtuber对应的所有按钮
+
+从`1970-01-01`到`2020-06-15`一共被点击了`2`次
+
+#### 分组语音统计数据
+```http request
+GET /statistics/:name/:group
+```
+
+|参数|说明|
+|:---:|:----:|
+|name|Vtuber 的名字|
+|group|组名|
+
+响应
+```json
+{
+    "vtuber": "<Vtuber的名字>",
+    "group": "<分组名称>",
+    "from": "<开始时间>",
+    "to": "<当前时间>",
+    "click": "<点击次数>"
+}
+```
+例如
+```json
+{
+    "vtuber": "fubuki",
+    "group": "actmoe",
+    "from": "1970-01-01",
+    "to": "2020-06-15",
+    "click": 2
+}
+```
+说明名叫`fubuki`的Vtuber对应的`actmoe`按钮
+
+从`1970-01-01`到`2020-06-15`一共被点击了`2`次
+
+#### 单个语音点击数据
+```http request
+GET /statistics/:name/:group/:voiceName
+```
+
+|参数|说明|
+|:---:|:----:|
+|name|Vtuber 的名字|
+|group|组名|
+|voiceName|音频文件名|
+
+响应
+```json
+{
+    "vtuber": "<Vtuber的名字>",
+    "name": "<音频文件名>",
+    "group": "<分组名称>",
+    "from": "<开始时间>",
+    "to": "<当前时间>",
+    "click": "<点击次数>"
+}
+```
+
+例如
+```json
+{
+    "vtuber": "fubuki",
+    "name": "f-006",
+    "group": "actmoe",
+    "from": "1970-01-01",
+    "to": "2020-06-15",
+    "click": 2
+}
+```
+说明名叫`fubuki`的Vtuber对应的`actmoe`中的`f-006`按钮
+
+从`1970-01-01`到`2020-06-15`一共被点击了`2`次
+
+#### 为某个按钮的点击次数+1
+```http request
+POST /statistics/:name/click
+```
+
+|参数|说明|
+|:---:|:----:|
+|name|Vtuber 的名字|
+
+请求体
+```json
+{
+  "group": "<分组名称>",
+  "name": "<音频文件名>"
+}
+```
+- `group`: 按钮所属分组
+- `name`: 次数要+1的按钮
+
 ### 管理权限相关 API
 
 #### 你好
@@ -181,6 +302,7 @@ GET /users/hi
 ```
 
 ~~一个没什么用的 API，~~
+
 ~~可以用于测试是否已经登录~~
 
 #### 登录
