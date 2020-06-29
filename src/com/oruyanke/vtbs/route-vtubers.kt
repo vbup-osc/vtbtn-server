@@ -100,6 +100,7 @@ fun Route.vtuberRoutes() {
                 val vtb = param("vtb")
                 val group = param("group")
                 val name = param("name")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
 
                 mongo.forVtuber(vtb).voices().bulkWrite(
                     it.toBulkWriteOperations(group, name)
@@ -112,6 +113,7 @@ fun Route.vtuberRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
 
                 mongo.forVtuber(vtb).groups().bulkWrite(
                     it.toBulkWriteOperations(group)
@@ -131,6 +133,7 @@ fun Route.vtuberRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val name = param("name")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
 
                 mongo.forVtuber(vtb).voices().deleteOneById(name)
                 call.respond(HttpStatusCode.OK)
@@ -141,6 +144,7 @@ fun Route.vtuberRoutes() {
             errorAware {
                 val vtb = param("vtb")
                 val group = param("group")
+                sessionUser(mongo).mustBeTheAdminOf(vtb)
 
                 mongo.forVtuber(vtb).groups().deleteOneById(group)
                 mongo.forVtuber(vtb).voices().deleteMany(Voice::group eq group)
