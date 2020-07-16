@@ -47,6 +47,7 @@ fun Application.installFeatures() = run {
         method(HttpMethod.Put)
         method(HttpMethod.Delete)
         method(HttpMethod.Patch)
+        anyHost()
         allowCredentials = true
     }
 
