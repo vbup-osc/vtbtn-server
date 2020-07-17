@@ -23,7 +23,7 @@ class UserNotFoundException(uid: String, reason: String) : LoginException(
 
 class PasswordMismatchException(uid: String) : LoginException(
     uid,
-    "Password or account wrong"
+    "Wrong password or account"
 )
 
 class UserExistException(uid: String) : RegisterException(
