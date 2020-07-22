@@ -1,5 +1,6 @@
 package com.oruyanke.vtbs
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -26,12 +27,14 @@ data class UserSecurity(
 data class UserProfile(
     val name: String,
     val email: String,
+    @JsonIgnore
     val _id: ObjectId? = null
 )
 
 data class UserSession(
     val uid: String,
     val activatedDate: LocalDate,
+    @JsonIgnore
     val _id: ObjectId? = null
 )
 
@@ -55,6 +58,12 @@ suspend fun CoroutineClient.userProfileFor(uid: String): UserProfile {
         ?: throw UserNotFoundException(uid, "meta-data not found")
     return db.profiles().findOneById(user.userProfile)
         ?: throw UserNotFoundException(uid, "profile data not found")
+}
+
+suspend fun CoroutineClient.userProfileFor(user: User): UserProfile {
+    val db = userDB()
+    return db.profiles().findOneById(user.userProfile)
+        ?: throw UserNotFoundException(user.uid, "profile data not found")
 }
 
 suspend fun CoroutineCollection<UserSession>.newSession(uid: String): UserSession {

@@ -30,9 +30,15 @@ fun Route.userRoutes() {
         get("/hi") {
             errorAware {
                 val user = sessionUser(mongo)
+                val profile = mongo.userProfileFor(user)
+
                 call.respond(
                     mapOf(
-                        "msg" to "Hello! ${user.uid}"
+                        "msg" to "Hello! ${user.uid}",
+                        "uid" to user.uid,
+                        "root" to user.isRoot,
+                        "admin" to user.adminVtubers,
+                        "profile" to profile
                     )
                 )
             }
