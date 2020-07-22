@@ -27,14 +27,12 @@ data class UserSecurity(
 data class UserProfile(
     val name: String,
     val email: String,
-    @JsonIgnore
     val _id: ObjectId? = null
 )
 
 data class UserSession(
     val uid: String,
     val activatedDate: LocalDate,
-    @JsonIgnore
     val _id: ObjectId? = null
 )
 
