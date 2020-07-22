@@ -20,6 +20,10 @@ suspend fun Application.installEnvironment() {
     val mongo: CoroutineClient by inject()
     val db = mongo.userDB()
 
+    if (db.users().hasUser(envRoot)) {
+        return
+    }
+
     val salt = randomSalt()
     val securityId = db.securities().newSecurity(
         salt = salt,
