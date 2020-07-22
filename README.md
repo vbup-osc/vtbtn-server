@@ -21,7 +21,11 @@ mkdir /path/to/data/dir
 
 - 启动容器
 ```shell script
-docker run -d -p 8080:8080 -v <数据目录>:/data/db imkiva/vtbtn-server
+docker run -d -p 8080:8080 \
+  --env VTBTN_SERVER_ROOT_NAME=<超级用户 ID> \
+  --env VTBTN_SERVER_ROOT_PASSWORD=<超级用户密码> \
+  --volume <数据目录>:/data/db \
+  imkiva/vtbtn-server
 ```
 
 服务器将被启动在 `localhost:8080`
@@ -39,7 +43,11 @@ docker build -t imkiva/vtbtn-server:latest .
 
 - 启动容器
 ```shell script
-docker run -d -p 8080:8080 -v <数据目录>:/data/db imkiva/vtbtn-server
+docker run -d -p 8080:8080 \
+  --env VTBTN_SERVER_ROOT_NAME=<超级用户 ID> \
+  --env VTBTN_SERVER_ROOT_PASSWORD=<超级用户密码> \
+  --volume <数据目录>:/data/db \
+  imkiva/vtbtn-server
 ```
 
 ## 开发
