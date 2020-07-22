@@ -11,16 +11,16 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.util.date.GMTDate
 import io.ktor.util.date.Month
-import io.ktor.utils.io.core.toByteArray
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.addEachToSet
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.eq
 import org.litote.kmongo.pullAll
 import org.litote.kmongo.updateOne
-import java.security.MessageDigest
+import randomSalt
+import toPasswordHash
+import withSalt
 import java.time.LocalDate
-import java.util.*
 
 @ExperimentalUnsignedTypes
 fun Route.userRoutes() {
@@ -37,6 +37,7 @@ fun Route.userRoutes() {
                         "msg" to "Hello! ${user.uid}",
                         "uid" to user.uid,
                         "root" to user.isRoot,
+                        "verified" to user.verified,
                         "admin" to user.adminVtubers,
                         "profile" to profile
                     )
@@ -130,22 +131,6 @@ private data class ChangeAdminVtuberRequest(
     val add: List<String>?,
     val remove: List<String>?
 )
-
-private fun String.withSalt(salt: String) = this + salt
-
-private fun randomSalt() = UUID.randomUUID().toString()
-
-@ExperimentalUnsignedTypes
-private fun String.toPasswordHash() =
-    MessageDigest.getInstance("sha-256")
-        .digest(this.toByteArray())
-        .toHexString()
-
-@ExperimentalUnsignedTypes
-private fun ByteArray.toHexString() =
-    asUByteArray().joinToString("") {
-        it.toString(16).padStart(2, '0')
-    }
 
 private fun LocalDate.toHttpDate() =
     GMTDate(0, 0, 0, dayOfMonth, Month.from(monthValue), year)

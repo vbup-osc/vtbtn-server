@@ -8,6 +8,7 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.http.HttpMethod
 import io.ktor.jackson.jackson
 import io.ktor.routing.routing
+import kotlinx.coroutines.runBlocking
 import org.koin.dsl.module
 import org.koin.ktor.ext.koin
 import org.litote.kmongo.coroutine.coroutine
@@ -17,6 +18,9 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 object ServerConfig {
     const val MONGODB_PORT = 27000
+    const val ENV_ROOT_NAME = "VTBTN_SERVER_ROOT_NAME"
+    const val ENV_ROOT_PASSWORD = "VTBTN_SERVER_ROOT_PASSWORD"
+
     var TESTING = false
 }
 
@@ -27,6 +31,9 @@ object ServerConfig {
 fun Application.module(testing: Boolean = false) {
     ServerConfig.TESTING = testing
     installFeatures()
+    runBlocking {
+        installEnvironment()
+    }
 
     routing {
         vtuberRoutes()
