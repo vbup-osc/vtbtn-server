@@ -28,6 +28,8 @@ docker run -d -p 8080:8080 \
   imkiva/vtbtn-server
 ```
 
+**为了您和用户的身心健康，请勿直接传输明文密码，推荐使用非对称加密算法保证用户的隐私**
+
 服务器将被启动在 `localhost:8080`
 
 ### 从源码
@@ -49,6 +51,8 @@ docker run -d -p 8080:8080 \
   --volume <数据目录>:/data/db \
   imkiva/vtbtn-server
 ```
+
+**为了您和用户的身心健康，请勿直接传输明文密码，推荐使用非对称加密算法保证用户的隐私**
 
 ## 开发
 
@@ -257,7 +261,7 @@ GET /statistics/:name
     "click": 2
 }
 ```
-说明名叫`fubuki`的Vtuber对应的所有按钮
+说明名叫`fubuki`的 Vtuber 对应的所有按钮
 
 从`1970-01-01`到`2020-06-15`一共被点击了`2`次
 
@@ -291,7 +295,7 @@ GET /statistics/:name/:group
     "click": 2
 }
 ```
-说明名叫`fubuki`的Vtuber对应的`actmoe`按钮
+说明名叫`fubuki`的 Vtuber 对应的`actmoe`按钮
 
 从`1970-01-01`到`2020-06-15`一共被点击了`2`次
 
@@ -329,7 +333,7 @@ GET /statistics/:name/:group/:voiceName
     "click": 2
 }
 ```
-说明名叫`fubuki`的Vtuber对应的`actmoe`中的`f-006`按钮
+说明名叫`fubuki`的 Vtuber 对应的`actmoe`中的`f-006`按钮
 
 从`1970-01-01`到`2020-06-15`一共被点击了`2`次
 
@@ -359,9 +363,34 @@ POST /statistics/:name/click
 GET /users/hi
 ```
 
-~~一个没什么用的 API，~~
+获取用户信息
 
-~~可以用于测试是否已经登录~~
+##### 响应
+如果操作成功，服务器返回 `200 OK`，响应体中包含如下内容
+```json
+{
+    "msg": "欢迎消息",
+    "uid": "用户 ID",
+    "root": 是否为超级管理员(true|false),
+    "verified": 用户是否已验证(true|false),
+    "admin": ["管理的 Vtuber 1", "管理的 Vtuber 2", ...],
+    "profile": {
+        "name": "昵称",
+        "email": "邮箱"
+    }
+}
+```
+
+如果操作失败，服务器可能返回以下任一错误码:
+- 403: 权限不足
+- 500: 服务器内部错误 ~~(可以提 issue 了)~~
+
+无论是哪种错误，响应体中均会包含如下格式的信息
+```json
+{
+  "msg": "<操作失败的原因>"
+}
+```
 
 #### 登录
 ```http request
