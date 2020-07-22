@@ -28,6 +28,19 @@ docker run -d -p 8080:8080 \
   imkiva/vtbtn-server
 ```
 
+- 开发模式下启动容器
+如果处于开发模式下，推荐使用下列命令启动容器
+```shell script
+sudo docker run -p 8080:8080 \
+  --env VTBTN_SERVER_ROOT_NAME=<超级用户 ID> \
+  --env VTBTN_SERVER_ROOT_PASSWORD=<超级用户密码> \
+  --volume <数据目录>:/data/db \
+  --rm -it imkiva/vtbtn-server
+```
+
+该方式启动的容器为交互模式(`-it`)，可以使用 Ctrl-C 进行关闭容器，
+在容器关闭后，该容器会自动删除（数据不会删除），不会影响下次测试。
+
 **为了您和用户的身心健康，请勿直接传输明文密码，推荐使用非对称加密算法保证用户的隐私**
 
 服务器将被启动在 `localhost:8080`
